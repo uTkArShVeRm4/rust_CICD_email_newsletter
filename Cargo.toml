@@ -3,16 +3,18 @@ name = "rusty_email_newsletter"
 version = "0.1.0"
 edition = "2021"
 
-[target.aarch64-apple-darwin]
-rustflags = ["-C", "linker=clang", "-C", "link-arg=-fuse-ld=lld"]
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "rusty_email_newsletter"
 
 [dependencies]
 tokio = {version = "1", features = ["full"]}
 serde = {version = "1", features = ["derive"]}
 serde_json = "1"
-axum = "0.7.5"
-tower-http = {version = "0.5.2", features = ["fs"]}
-tower-cookies = {version = "0.10.0"}
+axum = {version = "0.7.5", features = ["tokio"]}
+
 [dev-dependencies]
-anyhow = "1"
-httpc-test = "0.1.1"
+reqwest = "0.11"
