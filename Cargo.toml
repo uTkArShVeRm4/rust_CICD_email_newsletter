@@ -14,7 +14,20 @@ name = "rusty_email_newsletter"
 tokio = {version = "1", features = ["full"]}
 serde = {version = "1", features = ["derive"]}
 serde_json = "1"
-axum = {version = "0.7.5", features = ["tokio"]}
+axum = {version = "0.7.5", features = ["tokio", "form"]}
+
+[dependencies.sqlx]
+version = "0.7.4"
+default-features = false
+features = [
+    "runtime-tokio",
+	"tls-rustls",
+    "macros",
+    "postgres",
+    "uuid",
+    "chrono",
+    "migrate"
+]
 
 [dev-dependencies]
 reqwest = "0.11"
