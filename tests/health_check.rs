@@ -1,4 +1,5 @@
-use rusty_email_newsletter::startup::run;
+use rusty_email_newsletter::{configuration::get_configuration, startup::run};
+use sqlx::{Connection, PgConnection};
 use std::{future::IntoFuture, time::Duration};
 use tokio::net::TcpListener;
 
@@ -22,6 +23,14 @@ async fn health_check_works() {
 async fn subscribe_returns_a_200_for_valid_form_data() {
     let app_address = spawn_app().await;
     tokio::time::sleep(Duration::from_millis(500)).await;
+
+    let configuration = get_configuration().expect("Failed to read configuration");
+    let connection_string = configuration.database.connection_string();
+
+    let mut connection = PgConnection::connect(&connection_string)
+        .await
+        .expect("Failed to connect to Postgres.");
+
     let client = reqwest::Client::new();
 
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
@@ -34,6 +43,14 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
         .expect("Failed to execute request.");
 
     assert_eq!(200, response.status().as_u16());
+
+    let saved = sqlx::query!("SELECT email, name FROM subscriptions")
+        .fetch_one(&mut connection)
+        .await
+        .expect("Failed to fetch saved subscriptions");
+
+    assert_eq!(saved.email, "ursula_le_guin%40gmail.com");
+    assert_eq!(saved.name, "le guin");
 }
 
 #[tokio::test]
