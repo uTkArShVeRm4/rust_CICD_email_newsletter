@@ -49,7 +49,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
         .await
         .expect("Failed to fetch saved subscriptions");
 
-    assert_eq!(saved.email, "ursula_le_guin%40gmail.com");
+    assert_eq!(saved.email, "ursula_le_guin@gmail.com");
     assert_eq!(saved.name, "le guin");
 }
 
@@ -60,7 +60,7 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
 
     let test_cases = vec![
         ("name=le%20guin", "missing the email"),
-        ("email=ursula_le_guin%40gmail.com", "missing the name"),
+        ("email=ursula_le_guin@gmail.com", "missing the name"),
         ("", "missing both name and email"),
     ];
 
@@ -87,10 +87,19 @@ async fn spawn_app() -> String {
         .await
         .expect("Failed to spawn tcp listener");
 
+    let configuration = get_configuration().expect("Failed to read configuration");
+    let connection_string = configuration.database.connection_string();
+
+    let connection = PgConnection::connect(&connection_string)
+        .await
+        .expect("Failed to connect to Postgres.");
+
     let addr = format!("http://127.0.0.1:{}", listener.local_addr().unwrap().port());
 
     tokio::spawn(async {
-        let server = run(listener).await.expect("Failed to create server");
+        let server = run(listener, connection)
+            .await
+            .expect("Failed to create server");
 
         let _ = server.into_future().await;
     });
