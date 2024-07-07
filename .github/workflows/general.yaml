@@ -30,6 +30,7 @@ jobs:
             cargo install sqlx-cli
             --version=${{ env.SQLX_VERSION }}
             --no-default-features
+            --features native-tls,postgres
             --locked
       - name: Install postgresql-client
         run: sudo apt-get update && sudo apt-get install postgresql-client -y
@@ -73,6 +74,7 @@ jobs:
         run:
           cargo install sqlx-cli
             --version=${{ env.SQLX_VERSION }}
+            --features native-tls,postgres
             --no-default-features
             --locked
       - name: Install postgresql-client
@@ -107,6 +109,7 @@ jobs:
         run:
           cargo install sqlx-cli
           --version=${{ env.SQLX_VERSION }}
+          --features native-tls,postgres
           --no-default-features
           --locked
       - name: Migrate database
