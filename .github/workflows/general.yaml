@@ -5,7 +5,6 @@ on: [push, pull_request]
 env:
   CARGO_TERM_COLOR: always
   SQLX_VERSION: 0.7.4
-  SQLX_FEATURES: "runtime-tokio,tls-rustls,macros,postgres,uuid,chrono,migrate"
 
 jobs:
   test:
@@ -30,7 +29,6 @@ jobs:
         run:
             cargo install sqlx-cli
             --version=${{ env.SQLX_VERSION }}
-            --features ${{ env.SQLX_FEATURES }}
             --no-default-features
             --locked
       - name: Install postgresql-client
